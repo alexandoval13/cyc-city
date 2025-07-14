@@ -5,7 +5,7 @@ import { getSupabaseAuthUser } from '@/lib/supabase/auth-helpers';
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  const user = await getSupabaseAuthUser(req);
+  const user = await getSupabaseAuthUser();
 
   if (!user)
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const user = await getSupabaseAuthUser(req);
+  const user = await getSupabaseAuthUser();
 
   if (!user)
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });
@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getSupabaseAuthUser(req);
+  const user = await getSupabaseAuthUser();
 
   if (!user)
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });

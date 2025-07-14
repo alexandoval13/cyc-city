@@ -1,7 +1,6 @@
 import { createClient } from './server';
-import { NextRequest } from 'next/server';
 
-export const getSupabaseAuthUser = async (req: NextRequest) => {
+export const getSupabaseAuthUser = async () => {
   const supabase = await createClient();
   const {
     data: { user },
