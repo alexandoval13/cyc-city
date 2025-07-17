@@ -6,7 +6,7 @@ export default async function Page() {
   const { data: bikes } = await supabase.from('bikes').select();
 
   return (
-    <main className="h-screen">
+    <main className="h-96 overflow-scroll border-4">
       <Dashboard data={bikes || []} />
     </main>
   );

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: 'media.trekbikes.com' },
       { hostname: 'embed.widencdn.net' },
     ],
+    localPatterns: [{ pathname: '/' }],
   },
 };
 

@@ -3,6 +3,7 @@ import { CardContent, CardFooter, CardHeader } from '../ui/card';
 import Image from 'next/image';
 import { QrCode } from '../icons/qrcode';
 import { Button } from '../ui/button';
+import CycCityBikeImage from '@/public/cyc-city-bike-bg.svg';
 
 type BikeCardProps = {
   data: bikes;
@@ -20,6 +21,7 @@ export default function BikeCard({
   const { id, name, make_model, total_mileage, image_url } = data;
 
   const unit = 'miles'; // TODO: make customizeable
+  const img_src = image_url ? image_url : CycCityBikeImage;
 
   const handleClickBike = () => {
     if (handleSelect) {
@@ -46,7 +48,7 @@ export default function BikeCard({
       >
         {image_url ? (
           <Image
-            src={image_url}
+            src={img_src}
             alt={`Image of ${name}`}
             height={100}
             width={100}

@@ -1,4 +1,5 @@
 import Greeting from '@/components/greeting';
+import { ThemeProvider } from 'next-themes';
 
 export default function Layout({
   children,
@@ -7,8 +8,10 @@ export default function Layout({
 }>) {
   return (
     <div>
-      <Greeting />
-      {children}
+      <ThemeProvider>
+        <Greeting />
+        {children}
+      </ThemeProvider>
     </div>
   );
 }
