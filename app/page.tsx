@@ -7,11 +7,8 @@ import { ConnectSupabaseSteps } from '@/components/tutorial/connect-supabase-ste
 import { SignUpUserSteps } from '@/components/tutorial/sign-up-user-steps';
 import { hasEnvVars } from '@/lib/utils';
 import Link from 'next/link';
-import Bikes from './bikes';
 
 export default function Home() {
-  const data = Bikes;
-  console.log({ data });
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">
