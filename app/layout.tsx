@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import NavigationMobile from '@/components/navigationMobile';
 import Image from 'next/image';
+import UserContextProvider from './contexts/UserContext';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -35,8 +36,10 @@ export default function RootLayout({
             </div>
             <div className="border-2" />
           </div>
-          {children}
-          <NavigationMobile />
+          <UserContextProvider>
+            {children}
+            <NavigationMobile />
+          </UserContextProvider>
         </ThemeProvider>
       </body>
     </html>
