@@ -4,6 +4,8 @@ import './globals.css';
 import NavigationMobile from '@/components/navigationMobile';
 import Image from 'next/image';
 import UserContextProvider from './contexts/UserContext';
+import { ThemeSwitcher } from '@/components/theme-switcher';
+import Greeting from '@/components/greeting';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -29,14 +31,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="sticky top-0 flex flex-col bg-inherit w-full gap-1">
-            <div className="flex flex-row p-2 justify-between">
-              <p className="text-2xl">CycCity</p>
-              <Image src="./icon.svg" alt="app-icon" height={24} width={24} />
-            </div>
-            <div className="border-2" />
-          </div>
           <UserContextProvider>
+            <div className="sticky top-0 flex flex-col bg-inherit w-full gap-1">
+              <div className="flex flex-row p-2 justify-between">
+                <Image src="./icon.svg" alt="app-icon" height={24} width={24} />
+                <Greeting />
+                <ThemeSwitcher />
+              </div>
+              <div className="border-2" />
+            </div>
             {children}
             <NavigationMobile />
           </UserContextProvider>
