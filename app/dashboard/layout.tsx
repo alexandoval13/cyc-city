@@ -1,5 +1,7 @@
+import Image from 'next/image';
 import Greeting from '@/components/greeting';
 import { ThemeProvider } from 'next-themes';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
 export default function Layout({
   children,
@@ -9,7 +11,14 @@ export default function Layout({
   return (
     <div>
       <ThemeProvider>
-        <Greeting />
+        <div className="sticky top-0 flex flex-col bg-inherit w-full gap-1">
+          <div className="flex flex-row p-2 justify-between">
+            <Image src="./icon.svg" alt="app-icon" height={24} width={24} />
+            <Greeting />
+            <ThemeSwitcher />
+          </div>
+          <div className="border-2" />
+        </div>
         {children}
       </ThemeProvider>
     </div>
