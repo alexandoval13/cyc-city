@@ -8,6 +8,8 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const user = await getSupabaseAuthUser();
 
+  console.log({ user });
+
   if (!user)
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });
 
