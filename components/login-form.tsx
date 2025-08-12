@@ -37,6 +37,7 @@ export function LoginForm({
         email,
         password,
       });
+
       if (error) throw error;
 
       const {
@@ -47,6 +48,7 @@ export function LoginForm({
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');
+      setPassword('');
     } finally {
       setIsLoading(false);
     }
