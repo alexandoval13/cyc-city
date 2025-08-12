@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Greeting from '@/components/greeting';
 import { ThemeProvider } from 'next-themes';
 import { ThemeSwitcher } from '@/components/theme-switcher';
+import { LogoutButton } from '@/components/logout-button';
 
 export default function Layout({
   children,
@@ -16,6 +17,7 @@ export default function Layout({
             <Image src="./icon.svg" alt="app-icon" height={24} width={24} />
             <Greeting />
             <ThemeSwitcher />
+            <LogoutButton />
           </div>
           <div className="border-2" />
         </div>
