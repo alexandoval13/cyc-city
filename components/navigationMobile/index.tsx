@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { AddIcon } from '../icons/add';
 import { BikeIcon } from '../icons/bike';

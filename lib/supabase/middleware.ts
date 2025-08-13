@@ -15,7 +15,6 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // cookiesToSet.forEach(({ name, value, options }) =>
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
@@ -36,32 +35,18 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  console.log({ user });
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
 
   if (
+    request.nextUrl.pathname !== '/' &&
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/error')
+    !request.nextUrl.pathname.startsWith('/auth')
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
-    return NextResponse.redirect(url);
-  }
-
-  // redirect to home if user is already logged in
-  if (
-    user &&
-    (request.nextUrl.pathname.startsWith('/auth') ||
-      request.nextUrl.pathname.startsWith('/login'))
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 

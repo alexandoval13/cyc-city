@@ -1,7 +1,7 @@
 import { QrCode } from '@/components/icons/qrcode';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Image from 'next/image';
 import CycCityBikeImage from '@/public/cyc-city-bike-bg.svg';
 

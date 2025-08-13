@@ -1,13 +1,4 @@
-import { redirect } from 'next/navigation';
-
-/**
- * Home page will serve as a initial signup tutorial type, otherwise redirect to dashboard
- * only dashboard redirect functionality in place for current use
- * @returns
- */
 export default function Home() {
-  redirect('/dashboard');
-
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">

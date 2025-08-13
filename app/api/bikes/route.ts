@@ -1,7 +1,7 @@
 import { PrismaClient } from '@/lib/generated/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomQR } from '../../../lib/api-helpers/randomQR';
-import { getSupabaseAuthUser } from '@/utils/supabase/auth-helpers';
+import { getSupabaseAuthUser } from '@/lib/supabase/auth-helpers';
 
 const prisma = new PrismaClient();
 
