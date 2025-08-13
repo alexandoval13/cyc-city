@@ -40,12 +40,7 @@ export function LoginForm({
 
       if (error) throw error;
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        router.push('/');
-      }
+      router.push('/protected');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');
       setPassword('');
