@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { handleRefreshTokenError } from './auth-helpers';
+import { redirectToLogin } from './server-helpers';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -58,45 +58,48 @@ export async function updateSession(request: NextRequest) {
       });
     }
 
-    // Handle refresh token errors
+    // Handle any auth errors
     if (error) {
-      const shouldClearCookies = await handleRefreshTokenError(
+      // Log the error for debugging
+      console.error('Auth error in middleware:', {
         error,
-        'middleware'
-      );
+        errorType: typeof error,
+        errorKeys: error && typeof error === 'object' ? Object.keys(error) : [],
+        timestamp: new Date().toISOString(),
+      });
 
-      if (shouldClearCookies) {
-        // Clear all auth cookies
-        const authCookies = ['sb-access-token', 'sb-refresh-token'];
-        authCookies.forEach((cookieName) => {
-          supabaseResponse.cookies.delete(cookieName);
-        });
+      // Clear auth cookies
+      const authCookies = ['sb-access-token', 'sb-refresh-token'];
+      authCookies.forEach((cookieName) => {
+        supabaseResponse.cookies.delete(cookieName);
+      });
 
-        // Redirect to login if not already on auth pages
-        if (
-          !request.nextUrl.pathname.startsWith('/auth') &&
-          !request.nextUrl.pathname.startsWith('/login')
-        ) {
-          const url = request.nextUrl.clone();
-          url.pathname = '/auth/login';
-          return NextResponse.redirect(url);
-        }
+      // Redirect to login if not already on auth pages
+      if (
+        !request.nextUrl.pathname.startsWith('/auth') &&
+        !request.nextUrl.pathname.startsWith('/login')
+      ) {
+        return redirectToLogin(request);
       }
     }
 
+    // Redirect to login if no user and not on login page
     if (
       !user &&
       !request.nextUrl.pathname.startsWith('/login') &&
       !request.nextUrl.pathname.startsWith('/auth') &&
       !request.nextUrl.pathname.startsWith('/error')
     ) {
-      // no user, potentially respond by redirecting the user to the login page
-      const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
-      return NextResponse.redirect(url);
+      return redirectToLogin(request);
     }
   } catch (error) {
-    console.error('Unexpected error in middleware:', error);
+    // Handle unexpected errors
+    console.error('Unexpected error in middleware:', {
+      error,
+      errorType: typeof error,
+      errorKeys: error && typeof error === 'object' ? Object.keys(error) : [],
+      timestamp: new Date().toISOString(),
+    });
 
     // Clear auth cookies on any unexpected error
     const authCookies = ['sb-access-token', 'sb-refresh-token'];

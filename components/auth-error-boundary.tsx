@@ -1,6 +1,5 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
-import { isRefreshTokenError } from '@/lib/supabase/auth-helpers';
+import { handleAuthError } from '@/lib/supabase/client-helpers';
 
 interface AuthErrorBoundaryProps {
   children: React.ReactNode;
@@ -23,35 +22,35 @@ export function AuthErrorBoundary({ children }: AuthErrorBoundaryProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const handleError = (event: ErrorEvent) => {
+    const handleError = async (event: ErrorEvent) => {
       const error = event.error;
 
-      // Check if it's an authentication error
+      // Handle any auth-related error
       if (
-        isRefreshTokenError(error) ||
-        error?.message?.includes('authapierror')
+        error?.message?.includes('auth') ||
+        error?.message?.includes('token') ||
+        error?.message?.includes('session')
       ) {
         setErrorMessage('Your session has expired. Please log in again.');
         setHasError(true);
 
         // Clear the session
-        const supabase = createClient();
-        supabase.auth.signOut();
+        await handleAuthError(error);
       }
     };
 
     window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', async (event) => {
       if (
-        isRefreshTokenError(event.reason) ||
-        event.reason?.message?.includes('authapierror')
+        event.reason?.message?.includes('auth') ||
+        event.reason?.message?.includes('token') ||
+        event.reason?.message?.includes('session')
       ) {
         setErrorMessage('Your session has expired. Please log in again.');
         setHasError(true);
 
         // Clear the session
-        const supabase = createClient();
-        supabase.auth.signOut();
+        await handleAuthError(event.reason);
       }
     });
 

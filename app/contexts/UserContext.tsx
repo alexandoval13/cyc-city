@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { createContext, useEffect, useState } from 'react';
-import { handleRefreshTokenError } from '@/lib/supabase/auth-helpers';
+import { handleAuthError } from '@/lib/supabase/client-helpers';
 
 type UserContextType = { user: User | null };
 
@@ -27,15 +27,9 @@ export default function UserContextProvider({
         } = await supabase.auth.getSession();
 
         if (error) {
-          const shouldClearSession = await handleRefreshTokenError(
-            error,
-            'client'
-          );
-
-          if (shouldClearSession) {
-            setUser(null);
-            return;
-          }
+          await handleAuthError(error);
+          setUser(null);
+          return;
         }
 
         setUser(session?.user ?? null);
