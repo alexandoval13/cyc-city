@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import NavigationMobile from '@/components/navigationMobile';
 import UserContextProvider from './contexts/UserContext';
+import { AuthErrorBoundary } from '@/components/auth-error-boundary';
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -28,10 +29,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <UserContextProvider>
-            {children}
-            <NavigationMobile />
-          </UserContextProvider>
+          <AuthErrorBoundary>
+            <UserContextProvider>
+              {children}
+              <NavigationMobile />
+            </UserContextProvider>
+          </AuthErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

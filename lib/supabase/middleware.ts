@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { redirectToLogin } from './server-helpers';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -21,9 +22,15 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              // Ensure cookies are secure in production
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              httpOnly: true,
+            });
+          });
         },
       },
     }
@@ -35,19 +42,70 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (
-    request.nextUrl.pathname !== '/' &&
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = '/auth/login';
-    return NextResponse.redirect(url);
+    // Debug logging for production issues
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Middleware auth check:', {
+        hasUser: !!user,
+        error: error?.message,
+        pathname: request.nextUrl.pathname,
+        cookies: request.cookies.getAll().map((c) => c.name),
+      });
+    }
+
+    // Handle any auth errors
+    if (error) {
+      // Log the error for debugging
+      console.error('Auth error in middleware:', {
+        error,
+        errorType: typeof error,
+        errorKeys: error && typeof error === 'object' ? Object.keys(error) : [],
+        timestamp: new Date().toISOString(),
+      });
+
+      // Clear auth cookies
+      const authCookies = ['sb-access-token', 'sb-refresh-token'];
+      authCookies.forEach((cookieName) => {
+        supabaseResponse.cookies.delete(cookieName);
+      });
+
+      // Redirect to login if not already on auth pages
+      if (
+        !request.nextUrl.pathname.startsWith('/auth') &&
+        !request.nextUrl.pathname.startsWith('/login')
+      ) {
+        return redirectToLogin(request);
+      }
+    }
+
+    // Redirect to login if no user and not on login page
+    if (
+      !user &&
+      !request.nextUrl.pathname.startsWith('/login') &&
+      !request.nextUrl.pathname.startsWith('/auth') &&
+      !request.nextUrl.pathname.startsWith('/error')
+    ) {
+      return redirectToLogin(request);
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    console.error('Unexpected error in middleware:', {
+      error,
+      errorType: typeof error,
+      errorKeys: error && typeof error === 'object' ? Object.keys(error) : [],
+      timestamp: new Date().toISOString(),
+    });
+
+    // Clear auth cookies on any unexpected error
+    const authCookies = ['sb-access-token', 'sb-refresh-token'];
+    authCookies.forEach((cookieName) => {
+      supabaseResponse.cookies.delete(cookieName);
+    });
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
