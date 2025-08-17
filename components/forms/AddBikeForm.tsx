@@ -37,16 +37,17 @@ export default function AddBikeForm() {
     }
 
     try {
+      console.log('formData', formData);
       const res = await fetch('/api/bikes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      const { data, error } = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || 'Failed to add bike');
+      if (error) {
+        setError(`An error occurred${error ? ` ${error}` : ''}`);
       } else {
         setSuccess('Bike added successfully!');
         setFormData({ name: '', make_model: '', specs: '' });

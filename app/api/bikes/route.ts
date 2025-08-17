@@ -6,6 +6,8 @@ import { getSupabaseAuthUser } from '@/lib/supabase/server-helpers';
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
+  console.log('POST request received', { req: req.body });
+
   const user = await getSupabaseAuthUser();
 
   console.log({ user });
