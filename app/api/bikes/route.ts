@@ -2,6 +2,7 @@ import { PrismaClient } from '@/lib/generated/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomQR } from '../../../lib/api-helpers/randomQR';
 import { getSupabaseAuthUser } from '@/lib/supabase/server-helpers';
+import { createClient } from '@/lib/supabase/server';
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });
 
   const body = await req.json();
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.from('bikes').insert([
+    {
+      user_id: user.id,
+      name: body.name,
+      make_model: body.make_model,
+      specs: body.specs,
+      qr_code_id: randomQR(),
+    },
+  ]);
+
+  if (error) {
+    console.error('Supabase insert error:', error);
+    return NextResponse.json({ error }, { status: 400 });
+  }
 
   try {
     const newBike = await prisma.bikes.create({
