@@ -10,7 +10,9 @@ export default async function Home() {
   //   redirect('/auth/login');
   // }
 
-  if (data?.user) redirect('/dashboard');
+  if (data?.user) {
+    redirect('/dashboard');
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center">

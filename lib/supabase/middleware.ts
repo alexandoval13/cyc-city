@@ -21,9 +21,15 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              // Ensure cookies are secure in production
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              httpOnly: true,
+            });
+          });
         },
       },
     }
@@ -40,6 +46,16 @@ export async function updateSession(request: NextRequest) {
       data: { user },
       error,
     } = await supabase.auth.getUser();
+
+    // Debug logging for production issues
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Middleware auth check:', {
+        hasUser: !!user,
+        error: error?.message,
+        pathname: request.nextUrl.pathname,
+        cookies: request.cookies.getAll().map((c) => c.name),
+      });
+    }
 
     // Handle refresh token errors
     if (error) {
