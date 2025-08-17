@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       qr_code_id: randomQR(),
     },
   ]);
-
+  console.log({ data });
   if (error) {
     console.error('Supabase insert error:', error);
     return NextResponse.json({ error }, { status: 400 });
