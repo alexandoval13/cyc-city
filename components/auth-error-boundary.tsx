@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { isRefreshTokenError } from '@/lib/supabase/auth-helpers';
 
 interface AuthErrorBoundaryProps {
   children: React.ReactNode;
@@ -27,9 +28,7 @@ export function AuthErrorBoundary({ children }: AuthErrorBoundaryProps) {
 
       // Check if it's an authentication error
       if (
-        error?.message?.includes('invalid refresh token') ||
-        error?.message?.includes('JWT expired') ||
-        error?.message?.includes('Invalid JWT') ||
+        isRefreshTokenError(error) ||
         error?.message?.includes('authapierror')
       ) {
         setErrorMessage('Your session has expired. Please log in again.');
@@ -44,9 +43,7 @@ export function AuthErrorBoundary({ children }: AuthErrorBoundaryProps) {
     window.addEventListener('error', handleError);
     window.addEventListener('unhandledrejection', (event) => {
       if (
-        event.reason?.message?.includes('invalid refresh token') ||
-        event.reason?.message?.includes('JWT expired') ||
-        event.reason?.message?.includes('Invalid JWT') ||
+        isRefreshTokenError(event.reason) ||
         event.reason?.message?.includes('authapierror')
       ) {
         setErrorMessage('Your session has expired. Please log in again.');

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { handleRefreshTokenError } from './auth-helpers';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -59,14 +60,12 @@ export async function updateSession(request: NextRequest) {
 
     // Handle refresh token errors
     if (error) {
-      console.error('Auth error in middleware:', error.message);
+      const shouldClearCookies = await handleRefreshTokenError(
+        error,
+        'middleware'
+      );
 
-      // If it's a refresh token error, clear the session and redirect to login
-      if (
-        error.message.includes('invalid refresh token') ||
-        error.message.includes('JWT expired') ||
-        error.message.includes('Invalid JWT')
-      ) {
+      if (shouldClearCookies) {
         // Clear all auth cookies
         const authCookies = ['sb-access-token', 'sb-refresh-token'];
         authCookies.forEach((cookieName) => {

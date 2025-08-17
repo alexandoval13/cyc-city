@@ -1,7 +1,8 @@
-import { createClient } from './server';
+import { createClient as createServerClient } from './server';
+import { createClient as createBrowserClient } from './client';
 
 export const getSupabaseAuthUser = async () => {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
   const {
     data: { user },
     error,
@@ -11,39 +12,48 @@ export const getSupabaseAuthUser = async () => {
   return user;
 };
 
-export const handleAuthError = async (error: unknown) => {
-  console.error('Auth error:', error);
-
-  // Check if it's a refresh token error
-  const errorMessage =
-    error && typeof error === 'object' && 'message' in error
-      ? String(error.message)
-      : '';
-
-  if (
-    errorMessage.includes('invalid refresh token') ||
-    errorMessage.includes('JWT expired') ||
-    errorMessage.includes('Invalid JWT')
-  ) {
-    // Clear the session
-    const supabase = await createClient();
-    await supabase.auth.signOut();
-
-    return {
-      shouldRedirect: true,
-      redirectTo: '/auth/login',
-      error: 'Session expired. Please log in again.',
-    };
+/**
+ * Checks if an error is a refresh token error that requires session cleanup
+ */
+export const isRefreshTokenError = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object' || !('message' in error)) {
+    return false;
   }
 
-  return {
-    shouldRedirect: false,
-    error: errorMessage || 'An authentication error occurred',
-  };
+  const message = String(error.message).toLowerCase();
+  return (
+    message.includes('invalid refresh token') ||
+    message.includes('jwt expired') ||
+    message.includes('invalid jwt')
+  );
+};
+
+/**
+ * Handles refresh token errors consistently across the application
+ */
+export const handleRefreshTokenError = async (
+  error: unknown,
+  context: 'middleware' | 'client' = 'client'
+) => {
+  if (!isRefreshTokenError(error)) {
+    return false;
+  }
+
+  console.error(`Refresh token error in ${context}:`, error);
+
+  if (context === 'client') {
+    // Client-side: clear session and update state
+    const supabase = createBrowserClient();
+    await supabase.auth.signOut();
+    return true;
+  }
+
+  // Middleware: return true to indicate cookies should be cleared
+  return true;
 };
 
 export const refreshSession = async () => {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   try {
     const { data, error } = await supabase.auth.refreshSession();

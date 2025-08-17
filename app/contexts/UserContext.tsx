@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { createContext, useEffect, useState } from 'react';
+import { handleRefreshTokenError } from '@/lib/supabase/auth-helpers';
 
 type UserContextType = { user: User | null };
 
@@ -26,16 +27,12 @@ export default function UserContextProvider({
         } = await supabase.auth.getSession();
 
         if (error) {
-          console.error('Error getting session:', error.message);
+          const shouldClearSession = await handleRefreshTokenError(
+            error,
+            'client'
+          );
 
-          // Handle refresh token errors
-          if (
-            error.message.includes('invalid refresh token') ||
-            error.message.includes('JWT expired') ||
-            error.message.includes('Invalid JWT')
-          ) {
-            // Clear the session and redirect to login
-            await supabase.auth.signOut();
+          if (shouldClearSession) {
             setUser(null);
             return;
           }
