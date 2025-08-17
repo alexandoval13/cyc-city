@@ -11,14 +11,19 @@ export const getSupabaseAuthUser = async () => {
   return user;
 };
 
-export const handleAuthError = async (error: any) => {
+export const handleAuthError = async (error: unknown) => {
   console.error('Auth error:', error);
 
   // Check if it's a refresh token error
+  const errorMessage =
+    error && typeof error === 'object' && 'message' in error
+      ? String(error.message)
+      : '';
+
   if (
-    error?.message?.includes('invalid refresh token') ||
-    error?.message?.includes('JWT expired') ||
-    error?.message?.includes('Invalid JWT')
+    errorMessage.includes('invalid refresh token') ||
+    errorMessage.includes('JWT expired') ||
+    errorMessage.includes('Invalid JWT')
   ) {
     // Clear the session
     const supabase = await createClient();
@@ -33,7 +38,7 @@ export const handleAuthError = async (error: any) => {
 
   return {
     shouldRedirect: false,
-    error: error?.message || 'An authentication error occurred',
+    error: errorMessage || 'An authentication error occurred',
   };
 };
 
