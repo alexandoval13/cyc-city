@@ -331,8 +331,8 @@ model bikes {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id       String     @db.Uuid
   name          String
-  make_model    String?
-  specs         String?
+  make_model    String
+  specs         String
   image_url     String?
   total_mileage Float?     @default(0)
   qr_code_id    String?    @unique

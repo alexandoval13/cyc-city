@@ -8,8 +8,6 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const user = await getSupabaseAuthUser();
 
-  console.log({ user });
-
   if (!user)
     return NextResponse.json({ error: 'Unauthorized user' }, { status: 401 });
 
@@ -59,7 +57,7 @@ export async function PUT(req: NextRequest) {
         id: body.id,
       },
       data: {
-        ...body.data,
+        ...body,
       },
     });
 

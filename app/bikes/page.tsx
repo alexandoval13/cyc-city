@@ -8,8 +8,7 @@ export default async function Page() {
 
   return (
     <main className="bg-inherit">
-      <div className="flex flex-row justify-between items-center p-2">
-        <p>BIKE LIST</p>
+      <div className="flex flex-row justify-end p-2">
         <AddBike />
       </div>
       <BikeData data={bikes || []} />

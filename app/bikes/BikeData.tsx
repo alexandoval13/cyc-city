@@ -3,6 +3,7 @@
 import BikeList from '@/components/bikes/BikeList';
 import { bikes } from '@/lib/generated/prisma';
 import { useRouter } from 'next/navigation';
+
 type BikeDataProps = {
   data: bikes[];
 };

@@ -1,3 +1,5 @@
+'use client';
+
 import { bikes } from '@/lib/generated/prisma';
 import { CardContent, CardFooter, CardHeader } from '../ui/card';
 import Image from 'next/image';
@@ -46,19 +48,18 @@ export default function BikeCard({
           selected ? 'border-4' : ''
         }`}
       >
-        {image_url ? (
-          <Image
-            src={img_src}
-            alt={`Image of ${name}`}
-            height={100}
-            width={100}
-          />
-        ) : null}
+        <Image
+          src={img_src}
+          alt={`Image of ${name}`}
+          height={100}
+          width={100}
+        />
+
         <div>
           <div className="flex flex-row">
             <p>{make_model}</p>
           </div>
-          <div className="flex flex-row gap-6 items-end">
+          <div className="flex flex-row gap-6 items-center">
             <p className="text-xs text-red-300">TRAVELED</p>
             <p>
               {total_mileage} {unit}
@@ -66,6 +67,7 @@ export default function BikeCard({
           </div>
         </div>
       </CardContent>
+
       {details ? (
         <CardFooter className="flex flex-row justify-between text-xs">
           <p>{data.specs}</p>

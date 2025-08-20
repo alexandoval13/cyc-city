@@ -1,12 +1,19 @@
 import { bikes } from '@/lib/generated/prisma';
 import BikeCard from './BikeCard';
 
+/**
+ * BikeList is rendered on the following pages:
+ * /dashboard
+ * /bikes
+ */
+
 type BikeListProps = {
   data: bikes[];
   details?: boolean;
   selected?: string | null;
   handleSelect?: (id: string) => void;
 };
+
 export default function BikeList({
   data,
   details,
