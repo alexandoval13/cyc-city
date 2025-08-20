@@ -1,5 +1,5 @@
-import BikeDetails from '@/components/bikes/BikeDetails';
 import { createClient } from '@/lib/supabase/server';
+import BikeDetails from '@/components/bikes/BikeDetails';
 
 export default async function Page({
   params,
@@ -10,24 +10,34 @@ export default async function Page({
 
   const supabase = await createClient();
 
-  const { data: bike, error } = await supabase
-    .from('bikes')
-    .select('*')
-    .eq('id', id)
-    .single();
+  try {
+    const { data: bike } = await supabase
+      .from('bikes')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-  return (
-    <main className="bg-inherit">
-      <BikeDetails data={bike} />
+    return (
+      <main className="bg-inherit">
+        {bike && <BikeDetails data={bike} />}
 
-      <div className="p-4">
-        <ul>
-          <li>Recommended/Reminder for maintenance</li>
-          <li>Last Service Date and Details</li>
-          <li>Travel/Use History</li>
-          <li>Actions</li>
-        </ul>
+        <div className="p-4">
+          <ul>
+            <li>Recommended/Reminder for maintenance</li>
+            <li>Last Service Date and Details</li>
+            <li>Travel/Use History</li>
+            <li>Actions</li>
+          </ul>
+        </div>
+      </main>
+    );
+  } catch (error) {
+    console.log(`Unable to fetch bike: ${error}`);
+
+    return (
+      <div>
+        <p>An error occurred</p>
       </div>
-    </main>
-  );
+    );
+  }
 }
